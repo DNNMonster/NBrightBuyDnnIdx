@@ -31,7 +31,7 @@ namespace Nevoweb.DNN.NBrightBuy.Providers
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="portalfinfo"></param>
+        /// <param name="portalId"></param>
         /// <returns></returns>
         public override string DoWork(int portalId)
         {
@@ -47,7 +47,7 @@ namespace Nevoweb.DNN.NBrightBuy.Providers
                     var storeSettings = new StoreSettings(portalId);
                     var pluginData = new PluginData(portalId); // get plugin data to see if this scheduler is active on this portal 
                     var plugin = pluginData.GetPluginByCtrl("dnnsearchindex");
-                    if (plugin != null && plugin.GetXmlPropertyBool("genxml/checkbox/active"))
+                    if (plugin != null && plugin.GetXmlPropertyBool("genxml/interfaces/genxml/checkbox/active"))
                     {
                         // The NBS scheduler is normally set to run hourly, therefore if we only want a process to run daily we need the logic this function.
                         // To to this we keep a last run flag on the sceduler settings
@@ -68,7 +68,7 @@ namespace Nevoweb.DNN.NBrightBuy.Providers
                         var lastrundate = DateTime.Now.AddYears(-99);
                         if (Utils.IsDate(lastrun)) lastrundate = Convert.ToDateTime(lastrun);
 
-                        var rtnmsg = DoProductIdx(portalId, lastrundate, storeSettings.DebugMode);
+                        var rtnmsg = DoProductIdx(PortalController.Instance.GetPortal(portalId), lastrundate, storeSettings.DebugMode);
                         setting.SetXmlProperty("genxml/lastrun", DateTime.Now.ToString("s"), TypeCode.DateTime);
                         objCtrl.Update(setting);
                         if (rtnmsg != "") return rtnmsg;
@@ -105,7 +105,7 @@ namespace Nevoweb.DNN.NBrightBuy.Providers
 
                 foreach (var p in l)
                 {
-                    var prodData = new ProductData(p.ItemID, portalId, lang);
+                    var prodData = new ProductData(p.ItemID, portal.PortalID, lang);
 
                     strContent = prodData.Info.GetXmlProperty("genxml/textbox/txtproductref") + " : " + prodData.SEODescription + " " + prodData.SEOName + " " + prodData.SEOTagwords + " " + prodData.SEOTitle;
 
